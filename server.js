@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/', function (req, res) {  
-  res.send('Hello World!')
+  res.send('Hello World!');
 })
 
 var pipe_request = function(method,url,req,res) {
@@ -37,36 +37,74 @@ var pipe_request = function(method,url,req,res) {
   }
 }
 
-var SubPath = {
-  'dbs':['/:id?','/data'],
-  'log':['','/log'],
-  'compactlog':['','/compact'],
-  'query':['/:index','/query'],
-};
-
 var Path = {
   'user_db':'http://localhost:8000',
-  'obec_students':'http://localhost:8001',
+  'attendance':'http://localhost:8001',
   'form_record':'http://localhost:8002'
 };
 
-for(var KeyPath in Path){
-  for(var keySubPath in SubPath){
-    var Select = '/'+keySubPath+'/'+KeyPath+SubPath[keySubPath][0];
-    
-    app.get(Select, function(req, res) {
-      var last_url = req.url.split("/");
-      var _path = '';
-      if(last_url.length == 4){
-        _path = SubPath[last_url[1]][1]+'/'+last_url[3];
-      }else{
-        _path = SubPath[last_url[1]][1];
-      }
-      var url = 'http://localhost:8000'+_path; 
-      pipe_request('GET',url,req,res);
+app.all('/dbs/:db/:id?', function(req,res) {
+  if(Path[req.params.db]){
+    var db_url = Path[req.params.db]+'/data';
+    if(req.params.id) {
+      db_url += '/'+req.params.id;
+    }
+    pipe_request(req.method,db_url,req,res);
+  }else{
+    res.json({
+      'ok': false,
+      'message': err
     });
   }
-}
+});
+
+app.get('/log/:db', function(req,res) {
+  if(Path[req.params.db]){
+    var db_url = Path[req.params.db]+'/log';
+    pipe_request(req.method,db_url,req,res);
+  }else{
+    res.json({
+      'ok': false,
+      'message': err
+    });
+  }
+});
+
+app.get('/compactlog/:db', function(req,res) {
+  if(Path[req.params.db]){
+    var db_url = Path[req.params.db]+'/compact';
+    pipe_request(req.method,db_url,req,res);
+  }else{
+    res.json({
+      'ok': false,
+      'message': err
+    });
+  }
+});
+
+app.post('/query/:db/:index', function(req,res) {
+  if(Path[req.params.db]){
+    var db_url = Path[req.params.db]+'/query/'+req.params.index;
+    pipe_request(req.method,db_url,req,res);
+  }else{
+    res.json({
+      'ok': false,
+      'message': err
+    });
+  }
+});
+
+app.post('/sync/:db', function(req,res) {
+  if(Path[req.params.db]){
+    var db_url = Path[req.params.db]+'/sync';
+    pipe_request(req.method,db_url,req,res);
+  }else{
+    res.json({
+      'ok': false,
+      'message': err
+    });
+  }
+});
 
 app.listen(PORT, function () {
   console.log('Server listening on port %d', this.address().port);
