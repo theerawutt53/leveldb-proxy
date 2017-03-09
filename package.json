@@ -1,0 +1,24 @@
+{
+  "name": "leveldb-proxy",
+  "version": "1.0.0",
+  "description": "leveldb-proxy provide proxy to redirect leveldb node",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theerawutt53/leveldb-proxy.git"
+  },
+  "author": [
+    "Theerawut Thaweephattharawong",
+    "Phongphun Kijsanayothin"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/theerawutt53/leveldb-proxy.git",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.1",
+    "express": "^4.15.2",
+    "express-authorization": "^1.0.0",
+    "express-session": "^1.15.1",
+    "request": "^2.80.0"
+  }
+}
