@@ -110,6 +110,6 @@ app.listen(PORT, function () {
 });
 */
 
-https.createServer(ssl.options, app).listen(PORT, HOST, null, function () {
+https.createServer(ssl.options, app).listen(PORT, null, function () {
   console.log('Server listening on port %d', this.address().port);
 });
