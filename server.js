@@ -5,7 +5,7 @@ var request = require('request');
 var https = require('https');
 var ssl = require('./ssl_option');
 
-var PORT = 80;
+var PORT = 44300;
 var app = express();
 
 app.use(cors());
@@ -37,15 +37,14 @@ var pipe_request = function(method,url,req,res) {
   }
 }
 
-var Path = {
-  'user_db':'http://localhost:8000',
-  'attendance':'http://localhost:8001',
-  'form_record':'http://localhost:8002'
+var path = {
+  'attendance':'http://localhost:44301',
+  'newindicator':'http://localhost:44302'
 };
 
 app.all('/dbs/:db/:id?', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/data';
+  if(path[req.params.db]){
+    var db_url = path[req.params.db]+'/data';
     if(req.params.id) {
       db_url += '/'+req.params.id;
     }
@@ -59,8 +58,8 @@ app.all('/dbs/:db/:id?', function(req,res) {
 });
 
 app.get('/log/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/log';
+  if(path[req.params.db]){
+    var db_url = path[req.params.db]+'/log';
     pipe_request(req.method,db_url,req,res);
   }else{
     res.json({
@@ -71,8 +70,8 @@ app.get('/log/:db', function(req,res) {
 });
 
 app.get('/compactlog/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/compact';
+  if(path[req.params.db]){
+    var db_url = path[req.params.db]+'/compact';
     pipe_request(req.method,db_url,req,res);
   }else{
     res.json({
@@ -83,8 +82,8 @@ app.get('/compactlog/:db', function(req,res) {
 });
 
 app.post('/query/:db/:index', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/query/'+req.params.index;
+  if(path[req.params.db]){
+    var db_url = path[req.params.db]+'/query/'+req.params.index;
     pipe_request(req.method,db_url,req,res);
   }else{
     res.json({
@@ -95,8 +94,8 @@ app.post('/query/:db/:index', function(req,res) {
 });
 
 app.post('/sync/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/sync';
+  if(path[req.params.db]){
+    var db_url = path[req.params.db]+'/sync';
     pipe_request(req.method,db_url,req,res);
   }else{
     res.json({
@@ -105,13 +104,12 @@ app.post('/sync/:db', function(req,res) {
     });
   }
 });
-
+/*
 app.listen(PORT, function () {
   console.log('Server listening on port %d', this.address().port);
 });
+*/
 
-/*
 https.createServer(ssl.options, app).listen(PORT, HOST, null, function () {
   console.log('Server listening on port %d', this.address().port);
 });
-*/
