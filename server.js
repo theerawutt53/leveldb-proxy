@@ -43,7 +43,6 @@ var pipe_request = function(method,url,req,res) {
   }
 }
 
-
 app.param('db',function(req,res,next,db) {
   if(!config.path[db]) {
     res.json({
@@ -54,7 +53,6 @@ app.param('db',function(req,res,next,db) {
     next();
   }
 });
-
 
 app.all('/dbs/:db/:id?', function(req,res) {
   var db_url = config.path[req.params.db]+'/data';
@@ -83,11 +81,13 @@ app.post('/sync/:db', function(req,res) {
   var db_url = config.path[req.params.db]+'/sync';
   pipe_request(req.method,db_url,req,res);
 });
-/*
+
 app.listen(config.port, function () {
   console.log('Server listening on port %d', this.address().port);
 });
-*/
+
+/*
 https.createServer(config.ssl_options, app).listen(config.port, null, function () {
   console.log('Server listening on port %d', this.address().port);
 });
+*/
