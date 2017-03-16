@@ -3,9 +3,8 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 var request = require('request');
 var https = require('https');
-var ssl = require('./ssl_option');
+var config = require('./config');
 
-var PORT = 80;
 var app = express();
 
 app.use(cors());
@@ -28,7 +27,14 @@ var pipe_request = function(method,url,req,res) {
       qs:req.query,
       json:true,
       body:req.body
-    }).pipe(res); 
+    })
+    .on('error', function(err) {
+      res.json({
+        'ok': false,
+        'message':err
+      });
+    })
+    .pipe(res)
   } else {
       request({
       method:method,
@@ -37,81 +43,51 @@ var pipe_request = function(method,url,req,res) {
   }
 }
 
-var Path = {
-  'user_db':'http://localhost:8000',
-  'attendance':'http://localhost:8001',
-  'form_record':'http://localhost:8002'
-};
-
-app.all('/dbs/:db/:id?', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/data';
-    if(req.params.id) {
-      db_url += '/'+req.params.id;
-    }
-    pipe_request(req.method,db_url,req,res);
-  }else{
+app.param('db',function(req,res,next,db) {
+  if(!config.path[db]) {
     res.json({
       'ok': false,
-      'message': err
+      'message': 'Database not found'
     });
+  } else {
+    next();
   }
 });
 
-app.get('/log/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/log';
-    pipe_request(req.method,db_url,req,res);
-  }else{
-    res.json({
-      'ok': false,
-      'message': err
-    });
+app.all('/dbs/:db/:id?', function(req,res) {
+  var db_url = config.path[req.params.db]+'/data';
+  if(req.params.id) {
+    db_url += '/'+req.params.id;
   }
+  pipe_request(req.method,db_url,req,res);
+});
+
+app.get('/log/:db', function(req,res) {  
+  var db_url = config.path[req.params.db]+'/log';
+  pipe_request(req.method,db_url,req,res);
 });
 
 app.get('/compactlog/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/compact';
-    pipe_request(req.method,db_url,req,res);
-  }else{
-    res.json({
-      'ok': false,
-      'message': err
-    });
-  }
+  var db_url = config.path[req.params.db]+'/compact';
+  pipe_request(req.method,db_url,req,res);
 });
 
 app.post('/query/:db/:index', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/query/'+req.params.index;
-    pipe_request(req.method,db_url,req,res);
-  }else{
-    res.json({
-      'ok': false,
-      'message': err
-    });
-  }
+  var db_url = config.path[req.params.db]+'/query/'+req.params.index;
+  pipe_request(req.method,db_url,req,res);
 });
 
 app.post('/sync/:db', function(req,res) {
-  if(Path[req.params.db]){
-    var db_url = Path[req.params.db]+'/sync';
-    pipe_request(req.method,db_url,req,res);
-  }else{
-    res.json({
-      'ok': false,
-      'message': err
-    });
-  }
+  var db_url = config.path[req.params.db]+'/sync';
+  pipe_request(req.method,db_url,req,res);
 });
 
-app.listen(PORT, function () {
+app.listen(config.port, function () {
   console.log('Server listening on port %d', this.address().port);
 });
 
 /*
-https.createServer(ssl.options, app).listen(PORT, HOST, null, function () {
+https.createServer(config.ssl_options, app).listen(config.port, null, function () {
   console.log('Server listening on port %d', this.address().port);
 });
 */

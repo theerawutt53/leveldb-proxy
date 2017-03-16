@@ -6,7 +6,7 @@ npm-debug.log*
 # Dependency directories
 node_modules
 
-ssl_option.js
+config.js
 databases/*
 ssl_certificate/*
 
