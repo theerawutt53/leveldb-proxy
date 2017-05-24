@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.get('/', function (req, res) {  
+app.get('/', function (req, res) {
   res.send('Hello World!');
 })
 
@@ -38,8 +38,8 @@ var pipe_request = function(method,url,req,res) {
   } else {
       request({
       method:method,
-      url:url, 
-    }).pipe(res); 
+      url:url,
+    }).pipe(res);
   }
 }
 
@@ -62,7 +62,12 @@ app.all('/dbs/:db/:id?', function(req,res) {
   pipe_request(req.method,db_url,req,res);
 });
 
-app.get('/log/:db', function(req,res) {  
+app.get('/index/:db', function(req,res) {
+  var db_url = config.path[req.params.db]+'/index';
+  pipe_request(req.method,db_url,req,res);
+});
+
+app.get('/log/:db', function(req,res) {
   var db_url = config.path[req.params.db]+'/log';
   pipe_request(req.method,db_url,req,res);
 });
